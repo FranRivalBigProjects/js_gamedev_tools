@@ -1,116 +1,1330 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>JavaScript GameDev Tools – Canvas, Physics & Game Loop Optimization</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="google-site-verification" content="PkLa_ViOo6FAHpvh8SacceMb95o9tePRdrqLNBz9X1M" />
+<meta name="robots" content="index, follow">
 
-  <!-- Google verification -->
-  <meta name="google-site-verification" content="PkLa_ViOo6FAHpvh8SacceMb95o9tePRdrqLNBz9X1M" />
+<title>2D Physics Sandbox – Canvas Physics Simulation JavaScript Tool</title>
 
-  <!-- SEO -->
-  <meta name="description" content="JavaScript game development tools for canvas performance, collision detection, game loop simulation, physics engines, sprite animation, and tilemap generation.">
-  <meta name="keywords" content="javascript game dev tools, canvas performance optimization, game loop javascript example, collision detection js, sprite animation tool javascript, tilemap generator js">
+<meta name="description" content="Free 2D sandbox game canvas physics simulation in JavaScript. Spawn objects, adjust gravity and elasticity, watch real-time collisions. Vanilla JS, no libraries, no login required.">
 
-  <!-- AdSense -->
-  <meta name="google-adsense-account" content="ca-pub-XXXXXXXXXXXXXXXX">
+<meta name="keywords" content="2d sandbox game canvas physics simulation javascript, javascript physics simulation, canvas physics javascript, 2d physics sandbox javascript, javascript game physics, canvas collision detection javascript, javascript sandbox physics engine, 2d physics canvas tutorial">
 
-  <!-- Open Graph -->
-  <meta property="og:title" content="JavaScript GameDev Tools – Canvas & Game Performance">
-  <meta property="og:description" content="Analyze canvas performance, game loops, physics, and animation in JavaScript games.">
-  <meta property="og:type" content="website">
+<link rel="canonical" href="https://franrivalbigprojects.github.io/js-gamedev-tools/">
 
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #020617;
-      color: #e2e8f0;
-      margin: 0;
-      padding: 40px;
+<meta property="og:title" content="2D Physics Sandbox – Canvas Physics Simulation JavaScript">
+<meta property="og:description" content="Interactive 2D physics sandbox. Spawn circles and boxes, adjust gravity and elasticity, watch real-time canvas collisions. Vanilla JS, no libraries.">
+<meta property="og:type" content="website">
+
+<meta name="google-adsense-account" content="ca-pub-XXXXXXXXXXXXXXXX">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --bg: #07080f;
+  --surface: #0b0d18;
+  --surface2: #0f1220;
+  --border: #161a2c;
+  --border-light: #1e2440;
+  --purple: #a78bfa;
+  --purple-dim: rgba(167,139,250,0.1);
+  --purple-dim2: rgba(167,139,250,0.05);
+  --green: #22c55e;
+  --green-dim: rgba(34,197,94,0.1);
+  --orange: #f97316;
+  --orange-dim: rgba(249,115,22,0.08);
+  --cyan: #06b6d4;
+  --cyan-dim: rgba(6,182,212,0.08);
+  --text: #c8d5e8;
+  --text-muted: #475569;
+  --text-dim: #1e2d48;
+  --mono: 'JetBrains Mono', monospace;
+  --sans: 'Inter', sans-serif;
+  --radius: 8px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: var(--sans);
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  line-height: 1.6;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background-image:
+    linear-gradient(var(--border) 1px, transparent 1px),
+    linear-gradient(90deg, var(--border) 1px, transparent 1px);
+  background-size: 44px 44px;
+  opacity: 0.18;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ─── HEADER ─── */
+header {
+  border-bottom: 1px solid var(--border);
+  padding: 12px 0;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(7,8,15,0.96);
+  backdrop-filter: blur(10px);
+}
+
+.header-inner {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  position: relative;
+  z-index: 1;
+}
+
+.logo-mark {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--purple);
+  background: var(--purple-dim2);
+  border: 1px solid rgba(167,139,250,0.2);
+  border-radius: 4px;
+  padding: 3px 8px;
+}
+
+.logo-text {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.logo-text strong { color: var(--purple); font-weight: 500; }
+
+/* ─── WRAPPER ─── */
+.wrapper {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+  position: relative;
+  z-index: 1;
+}
+
+/* ─── HERO ─── */
+.hero {
+  padding: 44px 0 32px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 32px;
+}
+
+.hero-eyebrow {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--purple);
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.hero-eyebrow::before {
+  content: '';
+  width: 16px;
+  height: 1px;
+  background: var(--purple);
+  opacity: 0.5;
+}
+
+h1 {
+  font-size: clamp(21px, 3.2vw, 28px);
+  font-weight: 700;
+  line-height: 1.2;
+  color: #fff;
+  margin-bottom: 12px;
+  letter-spacing: -0.02em;
+}
+
+h1 em { font-style: normal; color: var(--purple); }
+
+.hero-sub {
+  font-size: 15px;
+  color: var(--text-muted);
+  max-width: 600px;
+  line-height: 1.75;
+  margin-bottom: 20px;
+}
+
+.hero-sub strong { color: var(--text); }
+
+.badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.badge {
+  font-family: var(--mono);
+  font-size: 11px;
+  padding: 4px 10px;
+  border-radius: 4px;
+  border: 1px solid var(--border-light);
+  color: var(--text-muted);
+}
+
+.badge.purple {
+  color: var(--purple);
+  background: var(--purple-dim2);
+  border-color: rgba(167,139,250,0.25);
+}
+
+/* ─── SANDBOX LAYOUT ─── */
+.sandbox-wrap {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  margin-bottom: 16px;
+}
+
+.sandbox-head {
+  background: var(--surface2);
+  border-bottom: 1px solid var(--border);
+  padding: 10px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.sandbox-title {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.sandbox-stats {
+  display: flex;
+  gap: 16px;
+}
+
+.sb-stat {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--text-dim);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.sb-stat-val {
+  color: var(--purple);
+  font-weight: 500;
+}
+
+.sandbox-body {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  min-height: 480px;
+}
+
+/* controls panel */
+.controls-panel {
+  border-right: 1px solid var(--border);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  overflow-y: auto;
+}
+
+.ctrl-group-title {
+  font-family: var(--mono);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-dim);
+  margin-bottom: 8px;
+}
+
+.ctrl-row {
+  margin-bottom: 10px;
+}
+
+.ctrl-label {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--text-muted);
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 5px;
+}
+
+.ctrl-label span {
+  color: var(--purple);
+  font-weight: 500;
+}
+
+input[type=range] {
+  width: 100%;
+  height: 4px;
+  -webkit-appearance: none;
+  background: var(--border-light);
+  border-radius: 2px;
+  outline: none;
+  cursor: pointer;
+}
+
+input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--purple);
+  cursor: pointer;
+}
+
+/* spawn buttons */
+.spawn-btns {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.spawn-btn {
+  padding: 9px 12px;
+  font-family: var(--mono);
+  font-size: 12px;
+  border-radius: 5px;
+  cursor: pointer;
+  border: 1px solid;
+  text-align: left;
+  transition: opacity 0.15s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.spawn-btn:hover { opacity: 0.8; }
+
+.sb-circle {
+  background: var(--purple-dim);
+  color: var(--purple);
+  border-color: rgba(167,139,250,0.25);
+}
+
+.sb-box {
+  background: var(--orange-dim);
+  color: var(--orange);
+  border-color: rgba(249,115,22,0.25);
+}
+
+.sb-heavy {
+  background: var(--cyan-dim);
+  color: var(--cyan);
+  border-color: rgba(6,182,212,0.25);
+}
+
+.sb-clear {
+  background: transparent;
+  color: var(--text-muted);
+  border-color: var(--border-light);
+}
+
+/* mode buttons */
+.mode-btns {
+  display: flex;
+  gap: 6px;
+}
+
+.mode-btn {
+  flex: 1;
+  padding: 7px 8px;
+  font-family: var(--mono);
+  font-size: 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  border: 1px solid var(--border-light);
+  background: transparent;
+  color: var(--text-muted);
+  text-align: center;
+  transition: all 0.15s;
+}
+
+.mode-btn.active {
+  background: var(--purple-dim);
+  color: var(--purple);
+  border-color: rgba(167,139,250,0.3);
+}
+
+/* canvas */
+.canvas-wrap { position: relative; flex: 1; background: var(--bg); }
+
+#physicsCanvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  cursor: crosshair;
+}
+
+/* bottom toolbar */
+.sandbox-foot {
+  border-top: 1px solid var(--border);
+  background: var(--surface2);
+  padding: 10px 18px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.foot-btn {
+  font-family: var(--mono);
+  font-size: 11px;
+  padding: 6px 14px;
+  border-radius: 4px;
+  cursor: pointer;
+  border: 1px solid;
+  transition: opacity 0.15s;
+}
+
+.foot-btn:hover { opacity: 0.75; }
+
+.fb-pause {
+  background: var(--purple-dim);
+  color: var(--purple);
+  border-color: rgba(167,139,250,0.25);
+}
+
+.fb-reset {
+  background: transparent;
+  color: var(--text-muted);
+  border-color: var(--border-light);
+}
+
+.foot-hint {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--text-dim);
+  margin-left: auto;
+}
+
+/* ─── DIVIDER ─── */
+hr.divider { border: none; border-top: 1px solid var(--border); margin: 48px 0; }
+
+/* ─── CONTENT ─── */
+.content-section { margin-bottom: 48px; }
+
+.section-eyebrow {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--purple);
+  opacity: 0.7;
+  margin-bottom: 8px;
+  display: block;
+}
+
+h3 {
+  font-size: 18px;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 14px;
+  letter-spacing: -0.01em;
+}
+
+p {
+  font-size: 14px;
+  color: var(--text-muted);
+  line-height: 1.8;
+  margin-bottom: 12px;
+}
+
+code {
+  font-family: var(--mono);
+  font-size: 12px;
+  background: var(--surface2);
+  color: var(--purple);
+  padding: 2px 7px;
+  border-radius: 3px;
+  border: 1px solid var(--border-light);
+}
+
+/* code block */
+.code-block {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--purple);
+  border-radius: 4px;
+  padding: 14px 16px;
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--text-muted);
+  line-height: 1.8;
+  margin: 12px 0;
+  overflow-x: auto;
+}
+
+.ck { color: var(--purple); }
+.cf { color: var(--cyan); }
+.cs { color: var(--green); }
+.cc { color: var(--text-dim); }
+
+/* concept grid */
+.concept-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.concept-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px;
+}
+
+.cc-eye {
+  font-family: var(--mono);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  margin-bottom: 8px;
+}
+
+.cc-title {
+  font-size: 13px;
+  color: #fff;
+  font-weight: 600;
+  display: block;
+  margin-bottom: 6px;
+}
+
+.concept-card p { font-size: 13px; margin: 0; }
+
+/* dense block */
+.dense-block {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+  margin-top: 16px;
+}
+
+.dense-block p {
+  font-size: 14px;
+  margin-bottom: 16px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border);
+  line-height: 1.8;
+}
+
+.dense-block p:last-child { margin-bottom: 0; padding-bottom: 0; border-bottom: none; }
+.dense-block strong { color: var(--text); }
+
+/* FAQ */
+.faq-list {
+  margin-top: 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.faq-item { border-bottom: 1px solid var(--border); }
+.faq-item:last-child { border-bottom: none; }
+
+.faq-q {
+  width: 100%;
+  text-align: left;
+  background: var(--surface);
+  border: none;
+  padding: 15px 20px;
+  font-size: 14px;
+  color: var(--text);
+  font-family: var(--sans);
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  transition: background 0.15s;
+  font-weight: 500;
+}
+
+.faq-q:hover { background: var(--purple-dim2); }
+
+.faq-arrow {
+  font-size: 11px;
+  color: var(--text-dim);
+  transition: transform 0.2s;
+  flex-shrink: 0;
+  font-family: var(--mono);
+}
+
+.faq-item.open .faq-arrow { transform: rotate(180deg); }
+
+.faq-a {
+  display: none;
+  padding: 0 20px 16px;
+  font-size: 13px;
+  color: var(--text-muted);
+  line-height: 1.75;
+  border-top: 1px solid var(--border);
+  background: var(--bg);
+}
+
+.faq-item.open .faq-a { display: block; }
+
+/* other tools */
+.other-tools {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.other-tool-link {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 12px 16px;
+  text-decoration: none;
+  transition: border-color 0.15s, background 0.15s;
+  display: block;
+}
+
+.other-tool-link:hover {
+  border-color: rgba(167,139,250,0.3);
+  background: var(--purple-dim2);
+}
+
+.otl-eye {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  margin-bottom: 5px;
+}
+
+.otl-name {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--purple);
+  font-weight: 500;
+}
+
+/* footer */
+footer {
+  border-top: 1px solid var(--border);
+  padding: 22px 0;
+  position: relative;
+  z-index: 1;
+}
+
+.footer-inner {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 0 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+footer p { font-size: 11px; color: var(--text-dim); font-family: var(--mono); margin: 0; }
+
+@media (max-width: 680px) {
+  .sandbox-body { grid-template-columns: 1fr; }
+  .controls-panel { border-right: none; border-bottom: 1px solid var(--border); }
+  .concept-grid { grid-template-columns: 1fr; }
+  .hero { padding: 32px 0 22px; }
+}
+</style>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "2D Canvas Physics Simulation Sandbox",
+  "applicationCategory": "DeveloperApplication",
+  "operatingSystem": "Web",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+  "description": "Free interactive 2D sandbox physics simulation built with JavaScript Canvas API. Spawn circles and boxes, adjust gravity, elasticity, and friction. Real-time collision detection. Vanilla JS, no libraries, no login required.",
+  "featureList": "2D physics simulation, canvas collision detection, gravity simulation, elasticity control, real-time object spawning, vanilla JavaScript, no external libraries"
+}
+</script>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "How do you build a 2D physics simulation with JavaScript Canvas?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "A 2D canvas physics simulation needs four components: a game loop using requestAnimationFrame, a physics update step applying velocity and gravity to each object, collision detection (AABB for boxes, circle-circle for spheres, circle-AABB for mixed), and a canvas render step drawing the updated positions. Each frame: apply gravity to velocity, apply velocity to position, detect and resolve collisions with walls and other objects, then clear and redraw the canvas."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What is collision detection in JavaScript canvas games?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Collision detection determines when two game objects overlap. For circles: check if the distance between centers is less than the sum of radii. For axis-aligned boxes (AABB): check if the x and y ranges overlap. For circle-box: find the closest point on the box to the circle center and check if it's within the circle's radius. After detecting a collision, collision resolution pushes objects apart and reflects their velocities based on the coefficient of restitution (bounciness)."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What is a coefficient of restitution in physics simulation?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "The coefficient of restitution (COR) determines how much kinetic energy is preserved after a collision. COR of 1.0 = perfectly elastic (full bounce), COR of 0.0 = perfectly inelastic (no bounce). In the sandbox above, the elasticity slider controls this value. Real-world materials: rubber ~0.8, tennis ball ~0.75, steel ball ~0.6, clay ~0.1. In code: new_velocity = -old_velocity * restitution after a wall collision."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Should I use a physics library or write canvas physics from scratch?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "For learning and simple games, writing from scratch teaches the underlying concepts and avoids bundle weight. For production games with complex interactions, use Matter.js (feature-rich, good docs) or Planck.js (Box2D port for JavaScript). Matter.js adds ~80KB gzipped. For mobile games, Phaser.js includes a built-in physics system. The sandbox on this page is vanilla JS — no libraries — demonstrating that basic 2D physics is achievable with ~150 lines of code."
+      }
     }
-    h1 {
-      color: #a78bfa;
-    }
-    p {
-      max-width: 950px;
-      line-height: 1.6;
-    }
-    .tools {
-      margin-top: 30px;
-    }
-    .tool {
-      background: #1e293b;
-      padding: 14px;
-      margin-bottom: 12px;
-      border-radius: 8px;
-      transition: 0.2s;
-    }
-    .tool:hover {
-      background: #334155;
-    }
-    a {
-      color: #22c55e;
-      text-decoration: none;
-      font-weight: bold;
-    }
-    a:hover {
-      text-decoration: underline;
-    }
-  </style>
+  ]
+}
+</script>
+
 </head>
+
 <body>
 
-  <h1>JavaScript GameDev Tools</h1>
+<header>
+  <div class="header-inner">
+    <span class="logo-mark">2D</span>
+    <span class="logo-text"><strong>canvas</strong>-physics-sandbox</span>
+  </div>
+</header>
 
-  <p>
-    A collection of JavaScript tools for game developers working with canvas rendering,
-    physics simulations, animation systems, and real-time performance optimization.
-  </p>
+<div class="wrapper">
 
-  <p>
-    These tools help analyze game loops, detect performance bottlenecks,
-    simulate physics behavior, and improve gameplay responsiveness.
-  </p>
+  <!-- HERO -->
 
-  <div class="tools">
+  <section class="hero">
+    <p class="hero-eyebrow">Free JavaScript Game Dev Tool</p>
+    <h1><em>2D Canvas Physics Sandbox</em> —<br>JavaScript Physics Simulation</h1>
+    <p class="hero-sub">
+      Interactive <strong>2D sandbox physics simulation</strong> built with vanilla JavaScript Canvas. Spawn circles and boxes, adjust gravity, elasticity and friction — real-time collision detection with <strong>no libraries, no login.</strong>
+    </p>
+    <div class="badges">
+      <span class="badge purple">Vanilla JS</span>
+      <span class="badge purple">Canvas API</span>
+      <span class="badge">Collision detection</span>
+      <span class="badge">Gravity control</span>
+      <span class="badge">Elasticity</span>
+      <span class="badge">Free · No login</span>
+    </div>
+  </section>
 
-    <div class="tool"><a href="./javascript_canvas_performance_tester/">Canvas Performance Tester</a></div>
-    <div class="tool"><a href="./javascript_collision_detection_tester/">Collision Detection Tester</a></div>
-    <div class="tool"><a href="./javascript_game_loop_simulator/">Game Loop Simulator</a></div>
-    <div class="tool"><a href="./javascript_input_latency_tester/">Input Latency Tester</a></div>
-    <div class="tool"><a href="./javascript_physics_engine_sandbox/">Physics Engine Sandbox</a></div>
-    <div class="tool"><a href="./javascript_sprite_animation_tool/">Sprite Animation Tool</a></div>
-    <div class="tool"><a href="./javascript_tilemap_generator/">Tilemap Generator</a></div>
+  <!-- SANDBOX TOOL -->
+
+  <div class="sandbox-wrap">
+    <div class="sandbox-head">
+      <span class="sandbox-title">// 2D Physics Sandbox — Canvas Simulation</span>
+      <div class="sandbox-stats">
+        <span class="sb-stat">Objects <span class="sb-stat-val" id="objCount">0</span></span>
+        <span class="sb-stat">FPS <span class="sb-stat-val" id="fpsCount">0</span></span>
+      </div>
+    </div>
+
+
+<div class="sandbox-body">
+  <!-- Controls -->
+  <div class="controls-panel">
+
+    <div>
+      <p class="ctrl-group-title">// Spawn objects</p>
+      <div class="spawn-btns">
+        <button class="spawn-btn sb-circle" onclick="spawnCircle()">⬤ Circle</button>
+        <button class="spawn-btn sb-box" onclick="spawnBox()">■ Box</button>
+        <button class="spawn-btn sb-heavy" onclick="spawnHeavy()">◆ Heavy ball</button>
+        <button class="spawn-btn sb-clear" onclick="clearObjects()">✕ Clear all</button>
+      </div>
+    </div>
+
+    <div>
+      <p class="ctrl-group-title">// Physics</p>
+      <div class="ctrl-row">
+        <div class="ctrl-label">Gravity <span id="gravVal">0.4</span></div>
+        <input type="range" id="gravSlider" min="0" max="2" step="0.05" value="0.4" oninput="updateGrav(this.value)">
+      </div>
+      <div class="ctrl-row">
+        <div class="ctrl-label">Elasticity <span id="elastVal">0.65</span></div>
+        <input type="range" id="elastSlider" min="0" max="1" step="0.05" value="0.65" oninput="updateElast(this.value)">
+      </div>
+      <div class="ctrl-row">
+        <div class="ctrl-label">Friction <span id="fricVal">0.99</span></div>
+        <input type="range" id="fricSlider" min="0.9" max="1" step="0.005" value="0.99" oninput="updateFric(this.value)">
+      </div>
+    </div>
+
+    <div>
+      <p class="ctrl-group-title">// Click mode</p>
+      <div class="mode-btns">
+        <button class="mode-btn active" id="mode-spawn" onclick="setMode('spawn')">Spawn</button>
+        <button class="mode-btn" id="mode-push" onclick="setMode('push')">Push</button>
+      </div>
+    </div>
+
+    <div>
+      <p class="ctrl-group-title">// Presets</p>
+      <div class="spawn-btns">
+        <button class="spawn-btn sb-circle" onclick="presetRain()">⬇ Rain</button>
+        <button class="spawn-btn sb-box" onclick="presetBouncy()">↑ Bouncy</button>
+        <button class="spawn-btn sb-heavy" onclick="presetZeroG()">∞ Zero-G</button>
+      </div>
+    </div>
 
   </div>
 
-  <!-- SEO LONG TAIL -->
-  <h2>Common JavaScript Game Development Queries</h2>
+  <!-- Canvas -->
+  <div class="canvas-wrap">
+    <canvas id="physicsCanvas"></canvas>
+  </div>
+</div>
 
-  <ul>
-    <li>how to optimize canvas rendering performance javascript</li>
-    <li>javascript game loop explained with requestanimationframe</li>
-    <li>collision detection algorithms javascript example</li>
-    <li>how to reduce input latency in browser games</li>
-    <li>sprite animation system javascript tutorial</li>
-    <li>tilemap generation javascript 2d games</li>
-    <li>physics engine basics javascript game development</li>
-  </ul>
+<div class="sandbox-foot">
+  <button class="foot-btn fb-pause" id="pauseBtn" onclick="togglePause()">⏸ Pause</button>
+  <button class="foot-btn fb-reset" onclick="resetSim()">↺ Reset</button>
+  <span class="foot-hint">Click canvas to spawn · Drag to push</span>
+</div>
 
-  <p>
-    These tools are ideal for indie developers, web game creators,
-    and engineers building real-time interactive applications in JavaScript.
-  </p>
 
-  <!-- snippet SEO -->
-  <pre>
-function gameLoop() {
-  update();
-  render();
-  requestAnimationFrame(gameLoop);
+  </div>
+
+  <hr class="divider">
+
+  <!-- HOW IT WORKS -->
+
+  <section class="content-section">
+    <span class="section-eyebrow">// Physics concepts</span>
+    <h3>How 2D Canvas Physics Simulation Works in JavaScript</h3>
+    <p>
+      This sandbox uses <strong>vanilla JavaScript and the Canvas API</strong> — no Matter.js, no Box2D, no external libraries. Understanding the underlying physics code is the fastest way to learn game physics for your own projects.
+    </p>
+    <p>
+      Every frame, three steps run in sequence: <strong>physics update</strong> (apply gravity and velocity to position), <strong>collision detection</strong> (check all object pairs and walls), and <strong>render</strong> (clear canvas and draw updated positions). The loop runs via <code>requestAnimationFrame</code> for ~60fps.
+    </p>
+
+
+<div class="code-block"><span class="cc">// Core game loop — the foundation of every physics simulation</span>
+
+
+<span class="ck">function</span> <span class="cf">gameLoop</span>(timestamp) {
+<span class="ck">const</span> dt = (timestamp - lastTime) / <span class="cs">1000</span>; <span class="cc">// delta time in seconds</span>
+lastTime = timestamp;
+
+<span class="cf">update</span>(dt);     <span class="cc">// apply physics</span>
+<span class="cf">collide</span>();     <span class="cc">// detect + resolve</span>
+<span class="cf">render</span>();      <span class="cc">// draw frame</span>
+
+requestAnimationFrame(gameLoop);
+}</div>
+
+<div class="concept-grid">
+  <div class="concept-card">
+    <p class="cc-eye" style="color:var(--purple)">Gravity //</p>
+    <span class="cc-title">Applying Gravity</span>
+    <p>Each frame: <code>vy += gravity * dt</code>. Gravity is constant downward acceleration. Multiply by delta time to keep simulation frame-rate independent. Higher gravity = faster falling objects.</p>
+  </div>
+  <div class="concept-card">
+    <p class="cc-eye" style="color:var(--orange)">Collision //</p>
+    <span class="cc-title">Collision Detection</span>
+    <p>Circles: <code>dist &lt; r1 + r2</code>. Boxes: AABB overlap check on x and y axes simultaneously. After detection, collision resolution separates objects and reflects velocities using the restitution coefficient.</p>
+  </div>
+  <div class="concept-card">
+    <p class="cc-eye" style="color:var(--cyan)">Elasticity //</p>
+    <span class="cc-title">Coefficient of Restitution</span>
+    <p>After a wall collision: <code>vy = -vy * restitution</code>. Value 1.0 = perfect bounce (no energy loss). Value 0.0 = no bounce. Try the elasticity slider to see the difference — at 0.0 objects stick to the floor.</p>
+  </div>
+  <div class="concept-card">
+    <p class="cc-eye" style="color:var(--green)">Friction //</p>
+    <span class="cc-title">Damping / Friction</span>
+    <p>Each frame: <code>vx *= friction</code>. Values close to 1.0 preserve velocity (slippery). Values like 0.9 slow objects quickly. This simulates air resistance and surface friction without complex contact math.</p>
+  </div>
+</div>
+
+
+  </section>
+
+  <hr class="divider">
+
+  <!-- WHAT DEVS ASK -->
+
+  <section class="content-section">
+    <span class="section-eyebrow">// Community questions</span>
+    <h3>What Developers Ask About Canvas Physics in JavaScript</h3>
+    <div class="dense-block">
+      <p><strong>How do I implement circle-circle collision detection in JavaScript?</strong><br>
+      Calculate the distance between centers: <code>dist = Math.sqrt((x2-x1)² + (y2-y1)²)</code>. If <code>dist &lt; r1 + r2</code>, the circles overlap. For resolution: calculate the overlap amount, then move each circle apart by half the overlap along the collision normal. Reflect velocities along the normal using the restitution coefficient. For performance with many objects, use spatial hashing or a quadtree to avoid O(n²) checks — checking every pair is fine up to ~100 objects.</p>
+
+
+  <p><strong>What is delta time and why does it matter for physics?</strong><br>
+  Delta time is the time elapsed since the last frame (typically ~16.6ms at 60fps). Multiplying physics by delta time makes the simulation frame-rate independent — objects move the same distance per second regardless of frame rate. Without it: on a 30fps machine objects move at half speed, on a 120fps machine they move twice as fast. Always write physics as <code>position += velocity * deltaTime</code> not just <code>position += velocity</code>.</p>
+
+  <p><strong>Should I use requestAnimationFrame or setInterval for a game loop?</strong><br>
+  Always <code>requestAnimationFrame</code> for rendering. It syncs to the display refresh rate, pauses when the tab is hidden (saving battery), and provides a high-precision timestamp. <code>setInterval</code> is appropriate for fixed-rate game logic (like a network tick) but not for rendering. The pattern used in this sandbox: <code>requestAnimationFrame</code> for the render loop, with delta time capped at ~50ms to prevent physics explosions after tab unfocus.</p>
+
+  <p><strong>Why does my simulation explode (objects fly off screen) at high speeds?</strong><br>
+  This is the "tunneling" problem — a fast-moving object can pass completely through a wall in a single frame because the frame time is too large. Solutions: cap your delta time to prevent large physics steps, use sub-stepping (run physics 2-4× per frame with smaller dt), or add a velocity cap (<code>vx = Math.min(Math.abs(vx), MAX_VEL) * Math.sign(vx)</code>). The sandbox uses both delta time capping and velocity limits to stay stable.</p>
+</div>
+
+
+  </section>
+
+  <hr class="divider">
+
+  <!-- FAQ -->
+
+  <section class="content-section">
+    <span class="section-eyebrow">// FAQ</span>
+    <h3>Frequently Asked Questions</h3>
+    <div class="faq-list">
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">How is this 2D physics simulation built?<span class="faq-arrow">▾</span></button>
+        <div class="faq-a">Vanilla JavaScript and the HTML5 Canvas API — no Matter.js, no Box2D, no external libraries. The physics loop runs via requestAnimationFrame. Each frame applies gravity, updates positions, runs AABB and circle collision detection, resolves overlaps, and redraws. The full physics engine is under 200 lines of JS.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">What does elasticity (restitution) control?<span class="faq-arrow">▾</span></button>
+        <div class="faq-a">The coefficient of restitution determines how much kinetic energy is preserved after a collision. 1.0 = perfect bounce (all energy preserved). 0.0 = no bounce (objects stick). Real materials range from ~0.1 (clay) to ~0.85 (rubber). The elasticity slider in the sandbox controls this value — try dragging it to 0 and 1 to see the difference.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">What is the difference between AABB and circle collision?<span class="faq-arrow">▾</span></button>
+        <div class="faq-a">AABB (Axis-Aligned Bounding Box) collision checks whether two rectangles overlap by comparing their x and y ranges. Circle collision checks if the distance between centers is less than the sum of radii. Circle collision is faster to compute and more accurate for round objects. AABB is faster for rectangular objects. Most games use both and switch based on object shape.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">Should I use Matter.js for my JavaScript game?<span class="faq-arrow">▾</span></button>
+        <div class="faq-a">For learning: build from scratch first — you'll understand gravity, collision resolution, and the game loop. For production: Matter.js handles complex shapes, constraints, joints, sleeping bodies, and has good documentation. It adds ~80KB gzipped. For very simple games (fewer than 50 objects, basic shapes), vanilla JS physics like this sandbox is lighter and faster.</div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <section class="content-section">
+    <span class="section-eyebrow">// More game dev tools</span>
+    <h3>Other Tools</h3>
+    <div class="other-tools">
+      <a href="javascript_canvas_performance_tester/" class="other-tool-link">
+        <p class="otl-eye">canvas //</p>
+        <span class="otl-name">Canvas Performance</span>
+      </a>
+      <a href="javascript_collision_detection_tester/" class="other-tool-link">
+        <p class="otl-eye">physics //</p>
+        <span class="otl-name">Collision Tester</span>
+      </a>
+      <a href="javascript_game_loop_simulator/" class="other-tool-link">
+        <p class="otl-eye">loop //</p>
+        <span class="otl-name">Game Loop Simulator</span>
+      </a>
+      <a href="javascript_input_latency_tester/" class="other-tool-link">
+        <p class="otl-eye">input //</p>
+        <span class="otl-name">Input Latency Tester</span>
+      </a>
+      <a href="javascript_sprite_animation_tool/" class="other-tool-link">
+        <p class="otl-eye">sprite //</p>
+        <span class="otl-name">Sprite Animation</span>
+      </a>
+      <a href="javascript_tilemap_generator/" class="other-tool-link">
+        <p class="otl-eye">map //</p>
+        <span class="otl-name">Tilemap Generator</span>
+      </a>
+    </div>
+  </section>
+
+</div>
+
+<footer>
+  <div class="footer-inner">
+    <p>canvas-physics-sandbox · vanilla js · no libraries · no login</p>
+    <p>gravity · elasticity · collision detection · requestAnimationFrame</p>
+  </div>
+</footer>
+
+<script>
+// ─── PHYSICS ENGINE ───
+const canvas = document.getElementById('physicsCanvas');
+const ctx = canvas.getContext('2d');
+
+let objects = [];
+let paused = false;
+let gravity = 0.4;
+let restitution = 0.65;
+let friction = 0.99;
+let clickMode = 'spawn';
+let spawnType = 'circle';
+let lastTime = 0;
+let fps = 0;
+let frameCount = 0;
+let fpsTimer = 0;
+
+// Colors
+const COLORS = {
+  circle: ['#a78bfa','#c084fc','#e879f9','#818cf8'],
+  box: ['#f97316','#fb923c','#fbbf24','#f59e0b'],
+  heavy: ['#06b6d4','#0ea5e9','#38bdf8','#22d3ee']
+};
+
+function randomColor(type) {
+  const c = COLORS[type] || COLORS.circle;
+  return c[Math.floor(Math.random() * c.length)];
 }
-gameLoop();
-  </pre>
+
+function resizeCanvas() {
+  const wrap = canvas.parentElement;
+  canvas.width = wrap.clientWidth;
+  canvas.height = wrap.clientHeight || 480;
+}
+
+resizeCanvas();
+window.addEventListener('resize', resizeCanvas);
+
+// ─── OBJECT FACTORY ───
+function makeCircle(x, y, r, vx, vy, type) {
+  return {
+    type: 'circle', x, y, r: r || 14,
+    vx: vx || (Math.random() - 0.5) * 4,
+    vy: vy || -Math.random() * 3,
+    color: randomColor(type || 'circle'),
+    mass: r ? r * r * 0.01 : 1,
+    objType: type || 'circle'
+  };
+}
+
+function makeBox(x, y, w, h, vx, vy) {
+  return {
+    type: 'box', x: x - (w||28)/2, y: y - (h||28)/2,
+    w: w || 28, h: h || 28,
+    vx: vx || (Math.random() - 0.5) * 4,
+    vy: vy || -Math.random() * 3,
+    color: randomColor('box'),
+    mass: 1,
+    objType: 'box'
+  };
+}
+
+// ─── SPAWN ACTIONS ───
+function spawnCircle(x, y) {
+  if (objects.length >= 80) return;
+  const cx = x || canvas.width * (0.2 + Math.random() * 0.6);
+  const cy = y || canvas.height * 0.2;
+  objects.push(makeCircle(cx, cy, 10 + Math.random() * 12, 0, 0, 'circle'));
+  updateCount();
+}
+
+function spawnBox(x, y) {
+  if (objects.length >= 80) return;
+  const bx = x || canvas.width * (0.2 + Math.random() * 0.6);
+  const by = y || canvas.height * 0.2;
+  const s = 16 + Math.random() * 20;
+  objects.push(makeBox(bx, by, s, s));
+  updateCount();
+}
+
+function spawnHeavy(x, y) {
+  if (objects.length >= 80) return;
+  const hx = x || canvas.width * (0.3 + Math.random() * 0.4);
+  const hy = y || 60;
+  objects.push(makeCircle(hx, hy, 22 + Math.random() * 10, 0, 0, 'heavy'));
+  updateCount();
+}
+
+function clearObjects() { objects = []; updateCount(); }
+
+function updateCount() {
+  document.getElementById('objCount').textContent = objects.length;
+}
+
+// ─── PRESETS ───
+function presetRain() {
+  clearObjects();
+  document.getElementById('gravSlider').value = 0.6;
+  updateGrav(0.6);
+  document.getElementById('elastSlider').value = 0.5;
+  updateElast(0.5);
+  for (let i = 0; i < 20; i++) {
+    setTimeout(() => spawnCircle(
+      canvas.width * (0.1 + Math.random() * 0.8),
+      -20
+    ), i * 120);
+  }
+}
+
+function presetBouncy() {
+  clearObjects();
+  document.getElementById('gravSlider').value = 0.5;
+  updateGrav(0.5);
+  document.getElementById('elastSlider').value = 0.95;
+  updateElast(0.95);
+  for (let i = 0; i < 8; i++) spawnCircle();
+}
+
+function presetZeroG() {
+  clearObjects();
+  document.getElementById('gravSlider').value = 0;
+  updateGrav(0);
+  document.getElementById('elastSlider').value = 1.0;
+  updateElast(1.0);
+  for (let i = 0; i < 12; i++) {
+    objects.push(makeCircle(
+      canvas.width * (0.1 + Math.random() * 0.8),
+      canvas.height * (0.1 + Math.random() * 0.8),
+      8 + Math.random() * 12,
+      (Math.random() - 0.5) * 6,
+      (Math.random() - 0.5) * 6,
+      'circle'
+    ));
+  }
+  updateCount();
+}
+
+// ─── CONTROLS ───
+function updateGrav(v) {
+  gravity = parseFloat(v);
+  document.getElementById('gravVal').textContent = parseFloat(v).toFixed(2);
+}
+
+function updateElast(v) {
+  restitution = parseFloat(v);
+  document.getElementById('elastVal').textContent = parseFloat(v).toFixed(2);
+}
+
+function updateFric(v) {
+  friction = parseFloat(v);
+  document.getElementById('fricVal').textContent = parseFloat(v).toFixed(3);
+}
+
+function setMode(m) {
+  clickMode = m;
+  document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('mode-' + m).classList.add('active');
+}
+
+function togglePause() {
+  paused = !paused;
+  document.getElementById('pauseBtn').textContent = paused ? '▶ Resume' : '⏸ Pause';
+  if (!paused) { lastTime = performance.now(); requestAnimationFrame(loop); }
+}
+
+function resetSim() {
+  clearObjects();
+  document.getElementById('gravSlider').value = 0.4; updateGrav(0.4);
+  document.getElementById('elastSlider').value = 0.65; updateElast(0.65);
+  document.getElementById('fricSlider').value = 0.99; updateFric(0.99);
+}
+
+// ─── CANVAS CLICK ───
+canvas.addEventListener('click', (e) => {
+  const rect = canvas.getBoundingClientRect();
+  const x = e.clientX - rect.left;
+  const y = e.clientY - rect.top;
+  if (clickMode === 'spawn') {
+    if (spawnType === 'box') spawnBox(x, y);
+    else spawnCircle(x, y);
+  } else {
+    // push mode — push nearby objects
+    objects.forEach(o => {
+      const ox = o.type === 'circle' ? o.x : o.x + o.w/2;
+      const oy = o.type === 'circle' ? o.y : o.y + o.h/2;
+      const dx = ox - x, dy = oy - y;
+      const dist = Math.sqrt(dx*dx + dy*dy);
+      if (dist < 80 && dist > 0) {
+        const force = (80 - dist) / 80 * 8;
+        o.vx += (dx / dist) * force;
+        o.vy += (dy / dist) * force;
+      }
+    });
+  }
+});
+
+// ─── PHYSICS UPDATE ───
+const MAX_VEL = 18;
+const MAX_DT = 0.05;
+
+function update(dt) {
+  dt = Math.min(dt, MAX_DT);
+  objects.forEach(o => {
+    o.vy += gravity;
+    o.vx *= friction;
+    o.vy *= friction;
+    // clamp velocity
+    o.vx = Math.max(-MAX_VEL, Math.min(MAX_VEL, o.vx));
+    o.vy = Math.max(-MAX_VEL, Math.min(MAX_VEL, o.vy));
+    o.x += o.vx;
+    o.y += o.vy;
+    wallCollide(o);
+  });
+  objectCollide();
+}
+
+function wallCollide(o) {
+  if (o.type === 'circle') {
+    if (o.x - o.r < 0) { o.x = o.r; o.vx = Math.abs(o.vx) * restitution; }
+    if (o.x + o.r > canvas.width) { o.x = canvas.width - o.r; o.vx = -Math.abs(o.vx) * restitution; }
+    if (o.y - o.r < 0) { o.y = o.r; o.vy = Math.abs(o.vy) * restitution; }
+    if (o.y + o.r > canvas.height) { o.y = canvas.height - o.r; o.vy = -Math.abs(o.vy) * restitution; if (Math.abs(o.vy) < 0.5) o.vy = 0; }
+  } else {
+    if (o.x < 0) { o.x = 0; o.vx = Math.abs(o.vx) * restitution; }
+    if (o.x + o.w > canvas.width) { o.x = canvas.width - o.w; o.vx = -Math.abs(o.vx) * restitution; }
+    if (o.y < 0) { o.y = 0; o.vy = Math.abs(o.vy) * restitution; }
+    if (o.y + o.h > canvas.height) { o.y = canvas.height - o.h; o.vy = -Math.abs(o.vy) * restitution; if (Math.abs(o.vy) < 0.5) o.vy = 0; }
+  }
+}
+
+function objectCollide() {
+  for (let i = 0; i < objects.length; i++) {
+    for (let j = i + 1; j < objects.length; j++) {
+      const a = objects[i], b = objects[j];
+      if (a.type === 'circle' && b.type === 'circle') circleCircle(a, b);
+      else if (a.type === 'box' && b.type === 'box') boxBox(a, b);
+      else {
+        const circ = a.type === 'circle' ? a : b;
+        const box = a.type === 'box' ? a : b;
+        circleBox(circ, box);
+      }
+    }
+  }
+}
+
+function circleCircle(a, b) {
+  const dx = b.x - a.x, dy = b.y - a.y;
+  const dist = Math.sqrt(dx*dx + dy*dy);
+  const minDist = a.r + b.r;
+  if (dist >= minDist || dist === 0) return;
+  const nx = dx/dist, ny = dy/dist;
+  const overlap = (minDist - dist) / 2;
+  a.x -= nx * overlap; a.y -= ny * overlap;
+  b.x += nx * overlap; b.y += ny * overlap;
+  const dvx = a.vx - b.vx, dvy = a.vy - b.vy;
+  const dot = dvx*nx + dvy*ny;
+  if (dot > 0) return;
+  const impulse = dot * (1 + restitution) * 0.5;
+  a.vx -= impulse * nx; a.vy -= impulse * ny;
+  b.vx += impulse * nx; b.vy += impulse * ny;
+}
+
+function boxBox(a, b) {
+  const ax = a.x, ay = a.y, aw = a.w, ah = a.h;
+  const bx = b.x, by = b.y, bw = b.w, bh = b.h;
+  const ox = Math.min(ax+aw, bx+bw) - Math.max(ax, bx);
+  const oy = Math.min(ay+ah, by+bh) - Math.max(ay, by);
+  if (ox <= 0 || oy <= 0) return;
+  if (ox < oy) {
+    const sign = ax + aw/2 < bx + bw/2 ? -1 : 1;
+    a.x += sign * ox/2; b.x -= sign * ox/2;
+    const tmp = a.vx; a.vx = b.vx * restitution; b.vx = tmp * restitution;
+  } else {
+    const sign = ay + ah/2 < by + bh/2 ? -1 : 1;
+    a.y += sign * oy/2; b.y -= sign * oy/2;
+    const tmp = a.vy; a.vy = b.vy * restitution; b.vy = tmp * restitution;
+  }
+}
+
+function circleBox(c, b) {
+  const cx = Math.max(b.x, Math.min(b.x+b.w, c.x));
+  const cy = Math.max(b.y, Math.min(b.y+b.h, c.y));
+  const dx = c.x - cx, dy = c.y - cy;
+  const dist = Math.sqrt(dx*dx + dy*dy);
+  if (dist >= c.r || dist === 0) return;
+  const nx = dx/dist, ny = dy/dist;
+  const overlap = c.r - dist;
+  c.x += nx * overlap;
+  c.y += ny * overlap;
+  const dot = c.vx*nx + c.vy*ny;
+  if (dot < 0) {
+    c.vx -= (1+restitution) * dot * nx;
+    c.vy -= (1+restitution) * dot * ny;
+  }
+}
+
+// ─── RENDER ───
+function render() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  // floor line
+  ctx.beginPath();
+  ctx.strokeStyle = 'rgba(167,139,250,0.12)';
+  ctx.lineWidth = 1;
+  ctx.moveTo(0, canvas.height - 1);
+  ctx.lineTo(canvas.width, canvas.height - 1);
+  ctx.stroke();
+
+  objects.forEach(o => {
+    ctx.beginPath();
+    if (o.type === 'circle') {
+      ctx.arc(o.x, o.y, o.r, 0, Math.PI * 2);
+    } else {
+      ctx.rect(o.x, o.y, o.w, o.h);
+    }
+    ctx.fillStyle = o.color + '55';
+    ctx.fill();
+    ctx.strokeStyle = o.color;
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+  });
+}
+
+// ─── LOOP ───
+function loop(timestamp) {
+  if (paused) return;
+  const dt = (timestamp - lastTime) / 1000;
+  lastTime = timestamp;
+
+  // FPS
+  frameCount++;
+  fpsTimer += dt;
+  if (fpsTimer >= 0.5) {
+    fps = Math.round(frameCount / fpsTimer);
+    document.getElementById('fpsCount').textContent = fps;
+    frameCount = 0; fpsTimer = 0;
+  }
+
+  update(dt);
+  render();
+  requestAnimationFrame(loop);
+}
+
+// ─── INIT ───
+lastTime = performance.now();
+// spawn a few initial objects
+for (let i = 0; i < 5; i++) spawnCircle();
+spawnBox(); spawnBox();
+requestAnimationFrame(loop);
+
+function toggleFaq(btn) {
+  btn.parentElement.classList.toggle('open');
+}
+</script>
 
 </body>
 </html>
