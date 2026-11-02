@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="index, follow">
+<title>Falling Sand Game — Free Online Sand &amp; Particle Physics Sandbox</title>
+<meta name="description" content="Free falling sand game in your browser: draw sand, water, fire, wood and stone and watch them pile, flow, burn and smoke. No login, works on mobile.">
+<meta name="keywords" content="falling sand game, falling sand simulator, sand physics sandbox, particle sandbox, powder game online, 2d sandbox game, physics sandbox free">
+<link rel="canonical" href="https://franrivalbigprojects.github.io/js-gamedev-tools/falling-sand-game/">
+<meta property="og:title" content="Falling Sand Game — Free Online Particle Sandbox">
+<meta property="og:description" content="Draw sand, water, fire, wood and stone and watch them interact. A free falling sand simulator in vanilla JavaScript.">
+<meta property="og:type" content="website">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#07080f;--surface:#0b0d18;--surface2:#0f1220;--border:#161a2c;--border-light:#1e2440;--purple:#a78bfa;--purple-dim:rgba(167,139,250,.1);--purple-dim2:rgba(167,139,250,.05);--text:#c8d5e8;--muted:#475569;--mono:'JetBrains Mono',monospace;--sans:'Inter',sans-serif;--radius:8px}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:100vh;line-height:1.6}
+header{border-bottom:1px solid var(--border);padding:12px 0;position:sticky;top:0;z-index:100;background:rgba(7,8,15,.96);backdrop-filter:blur(10px)}
+.header-inner,.footer-inner{max-width:1000px;margin:0 auto;padding:0 24px;display:flex;align-items:center;gap:10px}
+.logo-mark{font-family:var(--mono);font-size:11px;font-weight:600;color:var(--purple);background:var(--purple-dim2);border:1px solid rgba(167,139,250,.2);border-radius:4px;padding:3px 8px}
+.logo-text{font-family:var(--mono);font-size:12px;color:var(--muted)}.logo-text strong{color:var(--purple);font-weight:500}
+.wrapper{max-width:1000px;margin:0 auto;padding:0 24px 80px}
+.hero{padding:44px 0 32px;border-bottom:1px solid var(--border);margin-bottom:32px}
+.eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--purple);margin-bottom:14px}
+h1{font-size:clamp(21px,3.2vw,28px);font-weight:700;line-height:1.2;color:#fff;margin-bottom:12px;letter-spacing:-.02em}
+h1 em{font-style:normal;color:var(--purple)}
+h2{font-size:18px;font-weight:700;color:#fff;margin-bottom:14px}
+p{font-size:14px;color:var(--muted);line-height:1.8;margin-bottom:12px}
+p strong{color:var(--text)}
+.hero p{font-size:15px;max-width:620px}
+a{color:var(--purple)}
+code{font-family:var(--mono);font-size:12px;background:var(--surface2);color:var(--purple);padding:2px 7px;border-radius:3px;border:1px solid var(--border-light)}
+.badges{display:flex;flex-wrap:wrap;gap:7px}
+.badge{font-family:var(--mono);font-size:11px;padding:4px 10px;border-radius:4px;border:1px solid var(--border-light);color:var(--muted)}
+.badge.p{color:var(--purple);background:var(--purple-dim2);border-color:rgba(167,139,250,.25)}
+.sandbox{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+.sb-head,.sb-foot{background:var(--surface2);padding:10px 18px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.sb-head{border-bottom:1px solid var(--border);justify-content:space-between}
+.sb-foot{border-top:1px solid var(--border)}
+.sb-title,.stat,.hint{font-family:var(--mono);font-size:11px;color:var(--muted)}
+.sb-title{text-transform:uppercase;letter-spacing:.08em}
+.stat b{color:var(--purple);font-weight:500;margin-left:4px}.stat+.stat{margin-left:14px}
+.hint{margin-left:auto;font-size:10px}
+.sb-body{display:grid;grid-template-columns:200px 1fr}
+.panel{border-right:1px solid var(--border);padding:16px;display:flex;flex-direction:column;gap:16px}
+.gt{font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:8px}
+.lbl{font-family:var(--mono);font-size:11px;color:var(--muted);display:flex;justify-content:space-between;margin-bottom:5px}.lbl span{color:var(--purple)}
+input[type=range]{width:100%;height:4px;-webkit-appearance:none;appearance:none;background:var(--border-light);border-radius:2px;outline:none;cursor:pointer}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:var(--purple)}
+input[type=range]::-moz-range-thumb{width:14px;height:14px;border:0;border-radius:50%;background:var(--purple)}
+.tools-col{display:grid;grid-template-columns:1fr;gap:6px}
+button{font-family:var(--mono);cursor:pointer;border:1px solid var(--border-light);border-radius:5px;background:transparent;color:var(--muted);transition:opacity .15s}
+button:hover{opacity:.8}button:focus-visible{outline:2px solid var(--purple);outline-offset:2px}
+.el{padding:8px 10px;font-size:12px;text-align:left;display:flex;align-items:center;gap:9px}
+.el i{width:12px;height:12px;border-radius:2px;display:inline-block;flex-shrink:0}
+.el.on{background:var(--purple-dim);color:var(--purple);border-color:rgba(167,139,250,.35)}
+.fb{font-size:11px;padding:6px 14px}.fb.main{background:var(--purple-dim);color:var(--purple);border-color:rgba(167,139,250,.25)}
+.cw{position:relative;height:520px;background:var(--bg)}
+#c{display:block;width:100%;height:100%;cursor:crosshair;touch-action:none}
+hr{border:none;border-top:1px solid var(--border);margin:48px 0}
+.sec{margin-bottom:48px}
+pre.code{background:var(--surface2);border:1px solid var(--border);border-left:3px solid var(--purple);border-radius:4px;padding:14px 16px;font-family:var(--mono);font-size:12px;color:var(--text);line-height:1.8;margin:12px 0;overflow-x:auto}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px}
+.card h3{font-size:13px;color:#fff;margin-bottom:6px}.card p{font-size:13px;margin:0}
+.faq{margin-top:16px;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+.fi{border-bottom:1px solid var(--border)}.fi:last-child{border:none}
+.fq{width:100%;text-align:left;background:var(--surface);border:none;border-radius:0;padding:15px 20px;font-size:14px;color:var(--text);font-family:var(--sans);font-weight:500;display:flex;justify-content:space-between;gap:12px}
+.fa{display:none;padding:12px 20px 16px;font-size:13px;color:var(--muted);line-height:1.75;border-top:1px solid var(--border);background:var(--bg)}
+.fi.open .fa{display:block}
+.tools{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:8px;margin-top:12px}
+.tools a{background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:12px 16px;text-decoration:none;font-family:var(--mono);font-size:12px;font-weight:500}
+.tools a:hover{border-color:rgba(167,139,250,.3);background:var(--purple-dim2)}
+footer{border-top:1px solid var(--border);padding:22px 0}
+footer p{font-size:11px;color:var(--muted);font-family:var(--mono);margin:0}
+.footer-inner{justify-content:space-between;flex-wrap:wrap}
+@media(max-width:680px){.sb-body,.grid{grid-template-columns:1fr}.panel{border-right:none;border-bottom:1px solid var(--border)}.tools-col{grid-template-columns:1fr 1fr}.cw{height:420px}.hero{padding:32px 0 22px}}
+</style>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"SoftwareApplication","name":"Falling Sand Game","applicationCategory":"GameApplication","operatingSystem":"Web","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"description":"Free online falling sand game and particle sandbox. Draw sand, water, fire, wood and stone and watch them pile up, flow, burn and produce smoke. Vanilla JavaScript, no login."}
+</script>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[
+{"@type":"Question","name":"How does a falling sand game work?","acceptedAnswer":{"@type":"Answer","text":"The screen is a grid of cells and each cell holds one material. Every frame, each cell follows a small rule based on its neighbours: sand falls straight down if the cell below is empty, otherwise it slides diagonally. Piles, flowing water and spreading fire all emerge from these simple rules. This technique is called a cellular automaton."}},
+{"@type":"Question","name":"How do I make fire spread and burn things?","acceptedAnswer":{"@type":"Answer","text":"Draw wood, then touch it with fire. Each flame has a chance to ignite neighbouring wood, and burning wood releases smoke. Water puts fire out and turns it into smoke, while stone and sand do not burn."}},
+{"@type":"Question","name":"Is this falling sand game free and does it work on Android?","acceptedAnswer":{"@type":"Answer","text":"Yes. It is free, needs no login and runs in any modern browser, including Chrome on Android and Safari on iPhone. Drawing with a finger works like drawing with a mouse."}},
+{"@type":"Question","name":"What is the difference between a falling sand game and a 2D physics sandbox?","acceptedAnswer":{"@type":"Answer","text":"A 2D physics sandbox simulates solid objects such as circles and boxes that collide and bounce. A falling sand game simulates thousands of tiny particles, so materials pile up, flow and react with each other."}}
+]}
+</script>
+</head>
+<body>
+<header><div class="header-inner"><span class="logo-mark">▒</span><span class="logo-text"><strong>falling</strong>-sand-game</span></div></header>
+<div class="wrapper">
+
+<section class="hero">
+  <p class="eyebrow">Free JavaScript Particle Sandbox</p>
+  <h1><em>Falling Sand Game</em> — Free Online Sand &amp; Particle Physics Sandbox</h1>
+  <p>Draw <strong>sand, water, fire, wood and stone</strong> and watch them pile up, flow, burn and smoke. A free falling sand simulator in vanilla JavaScript: no libraries, no login, works on mobile.</p>
+  <div class="badges"><span class="badge p">Cellular automaton</span><span class="badge p">Canvas API</span><span class="badge">5 materials</span><span class="badge">Fire &amp; smoke</span><span class="badge">Touch friendly</span><span class="badge">Free · No login</span></div>
+</section>
+
+<div class="sandbox">
+  <div class="sb-head">
+    <span class="sb-title">// Falling sand game</span>
+    <div><span class="stat">Particles<b id="pc">0</b></span><span class="stat">FPS<b id="fps">0</b></span></div>
+  </div>
+  <div class="sb-body">
+    <div class="panel">
+      <div>
+        <p class="gt">// Material</p>
+        <div class="tools-col" id="tools">
+          <button class="el on" data-t="1"><i style="background:#debc5c"></i>Sand</button>
+          <button class="el" data-t="2"><i style="background:#3884eb"></i>Water</button>
+          <button class="el" data-t="3"><i style="background:#6e7687"></i>Stone</button>
+          <button class="el" data-t="4"><i style="background:#82542c"></i>Wood</button>
+          <button class="el" data-t="5"><i style="background:#ff8c1e"></i>Fire</button>
+          <button class="el" data-t="0"><i style="background:#07080f;border:1px solid #475569"></i>Eraser</button>
+        </div>
+      </div>
+      <div>
+        <p class="gt">// Brush</p>
+        <div class="lbl">Size<span id="bv">3</span></div>
+        <input type="range" min="1" max="10" step="1" value="3" aria-label="Brush size" id="brush">
+      </div>
+    </div>
+    <div class="cw"><canvas id="c" aria-label="Falling sand canvas"></canvas></div>
+  </div>
+  <div class="sb-foot">
+    <button class="fb main" id="pauseBtn">⏸ Pause</button>
+    <button class="fb" id="resetBtn">↺ Reset</button>
+    <button class="fb" id="clearBtn">✕ Clear all</button>
+    <span class="hint">Hold and drag to draw · Try wood + fire, then water</span>
+  </div>
+</div>
+
+<hr>
+
+<section class="sec">
+  <h2>How a Falling Sand Game Works</h2>
+  <p>This falling sand game is a <strong>cellular automaton</strong>. The canvas is a grid of tiny cells, each holding one material. Every frame, each cell looks at its neighbours and follows a short rule. Nothing is scripted: sand piles up, water finds its level and fire spreads only because of those rules.</p>
+  <p>Because each particle is just a grid cell, you can simulate thousands at once on a phone. If you want solid objects that collide and bounce instead, try the <a href="../">2D physics sandbox</a>; for planets and orbits, the <a href="../gravity-simulator-sandbox/">gravity simulator sandbox</a>.</p>
+<pre class="code">// sand: fall, else slide diagonally
+if (isFree(x, y + 1))            move(x, y, x, y + 1);
+else if (isFree(x - s, y + 1))   move(x, y, x - s, y + 1);
+else if (isFree(x + s, y + 1))   move(x, y, x + s, y + 1);
+// s = -1 or +1, chosen at random so piles stay symmetric</pre>
+  <div class="grid">
+    <div class="card"><h3>Sand piles</h3><p>Sand slides off the sides of a pile until it settles into a slope. Real piles do the same at the “angle of repose”.</p></div>
+    <div class="card"><h3>Flowing water</h3><p>Water falls, then spreads sideways until it is level. Sand sinks through it because it swaps places with the water.</p></div>
+    <div class="card"><h3>Fire and smoke</h3><p>Flames rise, ignite wood next to them and release smoke. Water puts fire out and turns it into steam-like smoke.</p></div>
+    <div class="card"><h3>Stone and wood</h3><p>Stone is a permanent wall for building containers and ramps. Wood stays put until fire reaches it.</p></div>
+  </div>
+</section>
+
+<hr>
+
+<section class="sec">
+  <h2>Falling Sand Game FAQ</h2>
+  <div class="faq">
+    <div class="fi"><button class="fq" onclick="faq(this)">How does a falling sand game work?<span>▾</span></button><div class="fa">The screen is a grid of cells and each cell holds one material. Every frame, each cell follows a small rule based on its neighbours: sand falls straight down if the cell below is empty, otherwise it slides diagonally. Piles, flowing water and spreading fire all emerge from these simple rules. This technique is called a cellular automaton.</div></div>
+    <div class="fi"><button class="fq" onclick="faq(this)">How do I make fire spread and burn things?<span>▾</span></button><div class="fa">Draw wood, then touch it with fire. Each flame has a chance to ignite neighbouring wood, and burning wood releases smoke. Water puts fire out and turns it into smoke, while stone and sand do not burn.</div></div>
+    <div class="fi"><button class="fq" onclick="faq(this)">Is this falling sand game free and does it work on Android?<span>▾</span></button><div class="fa">Yes. It is free, needs no login and runs in any modern browser, including Chrome on Android and Safari on iPhone. Drawing with a finger works like drawing with a mouse.</div></div>
+    <div class="fi"><button class="fq" onclick="faq(this)">What is the difference between a falling sand game and a 2D physics sandbox?<span>▾</span></button><div class="fa">A 2D physics sandbox simulates solid objects such as circles and boxes that collide and bounce. A falling sand game simulates thousands of tiny particles, so materials pile up, flow and react with each other.</div></div>
+  </div>
+</section>
+
+<hr>
+
+<section class="sec">
+  <h2>More Game Dev Tools</h2>
+  <div class="tools">
+    <a href="../">2D Physics Sandbox</a>
+    <a href="../gravity-simulator-sandbox/">Gravity Simulator Sandbox</a>
+    <a href="../javascript_collision_detection_tester/">Collision Tester</a>
+    <a href="../javascript_game_loop_simulator/">Game Loop Simulator</a>
+  </div>
+</section>
+
+</div>
+<footer><div class="footer-inner"><p>falling-sand-game · vanilla js · no libraries · no login</p><p>sand · water · fire · wood · stone</p></div></footer>
+
+<script>
+const cv = document.getElementById('c'), ctx = cv.getContext('2d');
+const CELL = 4, EMPTY = 0, SAND = 1, WATER = 2, STONE = 3, WOOD = 4, FIRE = 5, SMOKE = 6;
+const BASE = { 1: [222,188,92], 2: [56,132,235], 3: [110,118,135], 4: [130,84,44], 6: [120,128,145] };
+const rgb = (r, g, b) => 0xff000000 | (b << 16) | (g << 8) | r;
+const cl = v => v < 0 ? 0 : v > 255 ? 255 : v;
+const BG = rgb(7, 8, 15);
+let W, H, g, life, stamp, frame = 0, off, octx, img, buf;
+let tool = SAND, brush = 3, paused = false, down = false, px = 0, py = 0, lastW = 0;
+let fc = 0, ft = 0, last = performance.now();
+
+function init() {
+  const w = cv.parentElement.clientWidth, h = cv.parentElement.clientHeight;
+  cv.width = w; cv.height = h; lastW = w;
+  W = Math.floor(w / CELL); H = Math.floor(h / CELL);
+  g = new Uint8Array(W * H); life = new Uint8Array(W * H); stamp = new Uint16Array(W * H);
+  off = document.createElement('canvas'); off.width = W; off.height = H;
+  octx = off.getContext('2d'); img = octx.createImageData(W, H); buf = new Uint32Array(img.data.buffer);
+}
+function fill(x0, y0, x1, y1, t) {
+  for (let y = Math.floor(y0); y < y1; y++) for (let x = Math.floor(x0); x < x1; x++)
+    if (x >= 0 && x < W && y >= 0 && y < H) g[y * W + x] = t;
+}
+function demo() {
+  g.fill(0); life.fill(0);
+  fill(W * .15, H * .55, W * .55, H * .55 + 3, STONE);
+  fill(W * .7, H * .75, W * .9, H * .95, WOOD);
+  fill(W * .6, H * .9, W * .62, H, STONE);
+  fill(W * .3, H * .2, W * .36, H * .35, SAND);
+}
+
+// movement helpers
+function move(i, j) {
+  let t = g[i]; g[i] = g[j]; g[j] = t;
+  t = life[i]; life[i] = life[j]; life[j] = t;
+  stamp[i] = frame; stamp[j] = frame;
+}
+const inB = (x, y) => x >= 0 && x < W && y >= 0 && y < H;
+
+function sand(x, y, i) {
+  if (y >= H - 1) return;
+  const d = i + W, s = Math.random() < .5 ? -1 : 1;
+  if (g[d] === EMPTY || g[d] === WATER) return move(i, d);
+  if (inB(x + s, y + 1) && (g[d + s] === EMPTY || g[d + s] === WATER)) return move(i, d + s);
+  if (inB(x - s, y + 1) && (g[d - s] === EMPTY || g[d - s] === WATER)) return move(i, d - s);
+}
+function water(x, y, i) {
+  const s = Math.random() < .5 ? -1 : 1;
+  if (y < H - 1) {
+    if (g[i + W] === EMPTY) return move(i, i + W);
+    if (inB(x + s, y + 1) && g[i + W + s] === EMPTY) return move(i, i + W + s);
+    if (inB(x - s, y + 1) && g[i + W - s] === EMPTY) return move(i, i + W - s);
+  }
+  if (inB(x + s, y) && g[i + s] === EMPTY) return move(i, i + s);
+  if (inB(x - s, y) && g[i - s] === EMPTY) return move(i, i - s);
+}
+const DX = [1, -1, 0, 0], DY = [0, 0, 1, -1];
+function fire(x, y, i) {
+  for (let k = 0; k < 4; k++) {
+    const nx = x + DX[k], ny = y + DY[k];
+    if (!inB(nx, ny)) continue;
+    const j = ny * W + nx, u = g[j];
+    if (u === WATER) {
+      g[i] = SMOKE; life[i] = 50;
+      if (Math.random() < .15) { g[j] = SMOKE; life[j] = 50; }
+      return;
+    }
+    if (u === WOOD && Math.random() < .05) { g[j] = FIRE; life[j] = 50 + (Math.random() * 60 | 0); }
+  }
+  const l = life[i];
+  if (l <= 1) { if (Math.random() < .4) { g[i] = SMOKE; life[i] = 50; } else { g[i] = EMPTY; life[i] = 0; } return; }
+  life[i] = l - 1;
+  if (y > 0 && g[i - W] === EMPTY) {
+    if (Math.random() < .04) { g[i - W] = SMOKE; life[i - W] = 50; stamp[i - W] = frame; }
+    if (Math.random() < (l > 40 ? .03 : .5)) return move(i, i - W);
+  }
+  const s = Math.random() < .5 ? -1 : 1;
+  if (l <= 40 && Math.random() < .3 && inB(x + s, y) && g[i + s] === EMPTY) move(i, i + s);
+}
+function smoke(x, y, i) {
+  if (life[i] === 0 || y === 0) { g[i] = EMPTY; return; }
+  life[i]--;
+  const s = Math.random() < .5 ? -1 : 1;
+  if (g[i - W] === EMPTY && Math.random() < .6) return move(i, i - W);
+  if (inB(x + s, y) && g[i + s] === EMPTY && Math.random() < .5) move(i, i + s);
+}
+
+function step() {
+  frame = (frame + 1) & 0xffff;
+  const lr = frame & 1;
+  for (let y = H - 1; y >= 0; y--) {
+    for (let k = 0; k < W; k++) {
+      const x = lr ? k : W - 1 - k, i = y * W + x, t = g[i];
+      if (t === EMPTY || t === STONE || t === WOOD || stamp[i] === frame) continue;
+      if (t === SAND) sand(x, y, i); else if (t === WATER) water(x, y, i);
+      else if (t === FIRE) fire(x, y, i); else smoke(x, y, i);
+    }
+  }
+}
+
+function render() {
+  let n = 0;
+  for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+    const i = y * W + x, t = g[i];
+    if (t === EMPTY) { buf[i] = BG; continue; }
+    n++;
+    if (t === FIRE) { const l = life[i]; buf[i] = l > 25 ? rgb(255, 210, 70) : l > 12 ? rgb(255, 140, 30) : rgb(220, 60, 20); }
+    else { const b = BASE[t], v = ((x * 7 + y * 13) & 7) * 3 - 10; buf[i] = rgb(cl(b[0] + v), cl(b[1] + v), cl(b[2] + v)); }
+  }
+  octx.putImageData(img, 0, 0);
+  ctx.fillStyle = '#07080f'; ctx.fillRect(0, 0, cv.width, cv.height);
+  ctx.imageSmoothingEnabled = false;
+  ctx.drawImage(off, 0, 0, W * CELL, H * CELL);
+  document.getElementById('pc').textContent = n;
+}
+
+// drawing
+function paint(cx, cy) {
+  const r = brush;
+  for (let dy = -r; dy <= r; dy++) for (let dx = -r; dx <= r; dx++) {
+    if (dx * dx + dy * dy > r * r) continue;
+    const x = cx + dx, y = cy + dy;
+    if (!inB(x, y)) continue;
+    const i = y * W + x;
+    if (tool === EMPTY) { g[i] = EMPTY; life[i] = 0; continue; }
+    if (g[i] !== EMPTY) continue;
+    if ((tool === SAND || tool === WATER) && Math.random() < .5) continue;
+    g[i] = tool; life[i] = tool === FIRE ? 20 + (Math.random() * 15 | 0) : 0;
+  }
+}
+function cell(e) { const r = cv.getBoundingClientRect(); return [Math.floor((e.clientX - r.left) / CELL), Math.floor((e.clientY - r.top) / CELL)]; }
+cv.addEventListener('pointerdown', e => { down = true; [px, py] = cell(e); cv.setPointerCapture(e.pointerId); paint(px, py); });
+cv.addEventListener('pointermove', e => {
+  if (!down) return;
+  const [x, y] = cell(e), n = Math.max(Math.abs(x - px), Math.abs(y - py), 1);
+  for (let k = 1; k <= n; k++) paint(Math.round(px + (x - px) * k / n), Math.round(py + (y - py) * k / n));
+  px = x; py = y;
+});
+const up = () => { down = false; };
+cv.addEventListener('pointerup', up); cv.addEventListener('pointercancel', up);
+
+// UI
+document.getElementById('tools').addEventListener('click', e => {
+  const b = e.target.closest('.el'); if (!b) return;
+  tool = +b.dataset.t;
+  document.querySelectorAll('.el').forEach(x => x.classList.toggle('on', x === b));
+});
+document.getElementById('brush').addEventListener('input', e => { brush = +e.target.value; document.getElementById('bv').textContent = brush; });
+document.getElementById('pauseBtn').addEventListener('click', e => { paused = !paused; e.target.textContent = paused ? '▶ Resume' : '⏸ Pause'; });
+document.getElementById('resetBtn').addEventListener('click', demo);
+document.getElementById('clearBtn').addEventListener('click', () => { g.fill(0); life.fill(0); });
+function faq(btn) { btn.parentElement.classList.toggle('open'); }
+window.addEventListener('resize', () => { if (cv.parentElement.clientWidth !== lastW) { init(); demo(); } });
+
+function loop(t) {
+  fc++; ft += Math.min((t - last) / 1000, .1); last = t;
+  if (ft >= .5) { document.getElementById('fps').textContent = Math.round(fc / ft); fc = 0; ft = 0; }
+  if (down) paint(px, py);
+  if (!paused) { step(); step(); }
+  render();
+  requestAnimationFrame(loop);
+}
+init(); demo(); requestAnimationFrame(loop);
+</script>
+</body>
+</html>
